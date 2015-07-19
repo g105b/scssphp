@@ -516,7 +516,7 @@ class Parser
             $this->valueList($value) &&
             $this->end()
         ) {
-            $name = array('string', '', array($name));
+            $name = array('string', '', array(rtrim($name)));
             $this->append(array('assign', $name, $value), $s);
 
             return true;
