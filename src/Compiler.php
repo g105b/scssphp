@@ -458,6 +458,30 @@ class Compiler
     }
 
     /**
+     * Compile at-root
+     *
+     * @param \stdClass $atRoot
+     */
+    protected function compileAtRoot($atRoot)
+    {
+        $this->pushEnv($atRoot);
+
+        $scope = $this->scope;
+
+        $block = $this->makeOutputBlock('at-root');
+        $this->compileChildren($atRoot->children, $block);
+
+        // hoist
+        // - excludes selectors by default
+        // - moves outside of nested directives, e.g., (without: all), (without: media supports), (with: rule)
+        $scope->parent->children[] = $block;
+
+        $this->scope = $scope;
+
+        $this->popEnv();
+    }
+
+    /**
      * Compile media
      *
      * @param \stdClass $media
@@ -1038,6 +1062,10 @@ class Compiler
                 }
 
                 $this->compileNestedBlock($directive, array($s));
+                break;
+
+            case 'at-root':
+                $this->compileAtRoot($child[1]);
                 break;
 
             case 'media':
